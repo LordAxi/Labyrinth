@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bewegungsspiel mit Labyrinth</title>
+    <style>
+        .test {
+            width: 70px;
+            height: 70px;
+            background-color: lightgray; /* Standardfarbe für begehbare Felder */
+        }
+        .map {
+            display: grid;
+            grid-template-columns: repeat(10, 70px);
+            grid-template-rows: repeat(10, 70px);
+            gap: 10px; /* Abstand zwischen den Divs */
+            width: calc(10 * 70px + 9 * 10px); /* 10 Divs plus 9 Gaps */
+            height: calc(10 * 70px + 9 * 10px); /* 10 Divs plus 9 Gaps */
+        }
+        button {
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="yplu()">W</button>
+    <button onclick="xmin()">A</button>
+    <button onclick="ymin()">S</button>
+    <button onclick="xplu()">D</button>
+    <p id="position">Position: (0, 0)</p>
+    <div class="map">
+        <!-- 100 divs mit ids 1 bis 100 -->
+        <!-- Hier werden die Divs über JavaScript generiert -->
+    </div>
+
+    <script>
+let x = 0;
+let y = 0;
+
+// Definiere das Labyrinth (1 = Wand, 0 = begehbar)
+const labyrinth = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+    [1, 0, 0, 0, 1, 0, 1, 0, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 1],
+    [1, 0, 1, 0, 0, 0, 1, 0, 1, 1],
+    [1, 0, 0, 1, 1, 1, 1, 0, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1, 1],
+    [1, 0, 1, 0, 1, 1, 1, 0, 1, 1],
+    [1, 0, 1, 0, 0, 0, 1, 0, 0, 1],
+    [1, 0, 0, 0, 1, 1, 1, 0, 1, 1],
+    [0, 0, 1, 1, 1, 1, 1, 1, 1, 1]
+];
+
+// Dynamisch die 100 Divs erzeugen
+const mapDiv = document.querySelector(".map");
+for (let i = 0; i < 100; i++) {
+    let div = document.createElement("div");
+    div.classList.add("test");
+    div.id = i + 1;
+    mapDiv.appendChild(div);
+}
+
+// Funktion zum Setzen der Position
+function updatePosition() {
+    document.getElementById("position").innerText = `Position: (${x}, ${y})`;
+}
+
+// Funktion zum Setzen der Farben
+function color() {
+    for (let i = 0; i < 100; i++) {
+        const div = document.getElementById(i + 1);
+        const row = Math.floor(i / 10);
+        const col = i % 10;
+
+        if (labyrinth[row][col] === 1) {
+            div.style.backgroundColor = "black"; // Wand
+        } else {
+            div.style.backgroundColor = "lightgray"; // Begehbares Feld
+        }
+
+        if (col === x && row === (9 - y)) { // Spielerposition
+            div.style.backgroundColor = "green";
+        }
+    }
+}
+
+// Funktion zur Überprüfung des Level-Endes
+function checkWinCondition() {
+    if (x === 9 && y === 9) {
+        alert("Level geschafft! Weiter zum nächsten Level.");
+        window.location.href = "level2.html"; // Hier wird zum nächsten Level weitergeleitet
+    }
+}
+
+// Bewegung des Spielers nach oben
+function yplu() {
+    if (y < 9 && labyrinth[9 - (y + 1)][x] === 0) {
+        y += 1;
+    }
+    updatePosition();
+    color();
+    checkWinCondition();
+}
+
+// Bewegung des Spielers nach unten
+function ymin() {
+    if (y > 0 && labyrinth[9 - (y - 1)][x] === 0) {
+        y -= 1;
+    }
+    updatePosition();
+    color();
+    checkWinCondition();
+}
+
+// Bewegung des Spielers nach links
+function xmin() {
+    if (x > 0 && labyrinth[9 - y][x - 1] === 0) {
+        x -= 1;
+    }
+    updatePosition();
+    color();
+    checkWinCondition();
+}
+
+// Bewegung des Spielers nach rechts
+function xplu() {
+    if (x < 9 && labyrinth[9 - y][x + 1] === 0) {
+        x += 1;
+    }
+    updatePosition();
+    color();
+    checkWinCondition();
+}
+
+// Tastendruck-Event für Steuerung (Pfeiltasten und WASD)
+document.addEventListener("keydown", function(event) {
+    if (event.key === "w" || event.key === "ArrowUp") yplu();
+    if (event.key === "a" || event.key === "ArrowLeft") xmin();
+    if (event.key === "s" || event.key === "ArrowDown") ymin();
+    if (event.key === "d" || event.key === "ArrowRight") xplu();
+});
+
+window.onload = function() {
+    color();
+};
+    </script>
+</body>
+</html>
